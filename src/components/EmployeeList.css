@@ -1,0 +1,101 @@
+.employee-list-container {
+  width: 100%;
+  min-height: 720px;
+  height: 900px;
+  padding: 12px;
+  background: linear-gradient(90deg, #ff7e5f, #feb47b);
+  border-radius: 10px; 
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  color: #120c4f;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-container input{
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.search-container select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 200px
+  
+}
+
+.employee-list {
+  list-style: none;
+  padding: 0;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.employee-item {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #120c4f;
+}
+
+.employee-item:hover {
+  background: rgba(255, 255, 255, 0.2); 
+}
+
+.employee-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.employee-details {
+  font-size: 14px;
+  color: #120c4f
+}
+
+.team-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.filter-icon {
+  font-size: 18px;
+  color: #555;
+}
+
+.custom-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  color: #120c4f;
+}
+
+.custom-option:hover {
+  background-color: #f0f0f0;
+}
+
+.custom-single-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #120c4f;
+  font-weight: 500;
+}
+
+.custom-dropdown {
+  width: 220px;
+}
+
+

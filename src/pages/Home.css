@@ -1,0 +1,66 @@
+.home-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(90deg, #ff7e5f, #feb47b);
+  color: #120c4f;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.header h1 {
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  letter-spacing: 1px;
+}
+
+.home-container {
+  display: flex;
+  gap: 20px;
+  flex-grow: 1;
+  padding: 10px;
+}
+
+.sidebar {
+  width: 30%;
+}
+
+.org-chart-section {
+  width: 70%;
+}
+
+.welcome-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #2c3e50, #34495e);
+  color: #ffebcd; 
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  animation: fadeOut 3s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
