@@ -41,18 +41,37 @@ export const useEmployees = () => {
     onMutate: async ({ employeeId, updates }) => {
       await queryClient.cancelQueries({ queryKey: ["employees"] });
 
-      const previousEmployees = queryClient.getQueryData(["employees"]);
+      const previousEmployees = queryClient.getQueryData<Employee[]>([
+        "employees",
+      ]);
 
-      queryClient.setQueryData(["employees"], (oldEmployees: Employee[]) => {
-        return oldEmployees.map((emp) =>
-          emp.id === employeeId ? { ...emp, ...updates } : emp
-        );
-      });
+      queryClient.setQueryData(
+        ["employees"],
+        (oldEmployees: Employee[] | undefined) =>
+          oldEmployees
+            ? oldEmployees.map((emp) =>
+                emp.id === employeeId ? { ...emp, ...updates } : emp
+              )
+            : []
+      );
 
       return { previousEmployees };
     },
-    onError: (err, _, context) => {
-      queryClient.setQueryData(["employees"], context?.previousEmployees);
+    onError: (_, __, context) => {
+      if (context?.previousEmployees) {
+        queryClient.setQueryData(["employees"], context.previousEmployees);
+      }
+    },
+    onSuccess: (updatedEmployee) => {
+      queryClient.setQueryData(
+        ["employees"],
+        (oldEmployees: Employee[] | undefined) =>
+          oldEmployees
+            ? oldEmployees.map((emp) =>
+                emp.id === updatedEmployee.id ? updatedEmployee : emp
+              )
+            : []
+      );
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });

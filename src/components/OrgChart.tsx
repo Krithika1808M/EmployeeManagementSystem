@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+
+import "react-toastify/dist/ReactToastify.css";
 import "./OrgChart.css";
 
 interface Employee {
@@ -13,6 +17,7 @@ interface Employee {
 interface OrgChartProps {
   employees: Employee[];
   onUpdateManager: (employeeId: string, newManagerId: string | null) => void;
+  hoveredEmployeeId: string | null;
 }
 
 const transformToTree = (employees: Employee[]): Employee[] => {
@@ -40,7 +45,18 @@ const OrgNode: React.FC<{
   onDragStart: (id: string) => void;
   onDrop: (id: string) => void;
   onDragOver: (event: React.DragEvent) => void;
-}> = ({ employee, onDragStart, onDrop, onDragOver }) => {
+  highlightedEmployeeId: string | null;
+  isHighlighted?: boolean;
+}> = ({
+  employee,
+  onDragStart,
+  onDrop,
+  onDragOver,
+  highlightedEmployeeId,
+  isHighlighted,
+}) => {
+  const [showSubordinates, setShowSubordinates] = useState(true);
+
   //using this to generate random profile pictures for the employees in org chart
   const imageUrl = `https://randomuser.me/api/portraits/men/${
     parseInt(employee.id) % 50
@@ -49,7 +65,7 @@ const OrgNode: React.FC<{
   return (
     <div className="org-node-container">
       <div
-        className="org-node"
+        className={`org-node ${isHighlighted ? "highlighted" : ""}`}
         draggable
         onDragStart={() => onDragStart(employee.id)}
         onDrop={() => onDrop(employee.id)}
@@ -60,35 +76,52 @@ const OrgNode: React.FC<{
           <p className="org-name">{employee.name}</p>
           <p className="org-designation">{employee.designation}</p>
         </div>
+        {employee.children && employee.children.length > 0 && (
+          <div
+            className="toggle-icon"
+            onClick={() => setShowSubordinates(!showSubordinates)}
+          >
+            {showSubordinates ? <FaAngleUp /> : <FaAngleDown />}
+          </div>
+        )}
       </div>
 
-      {employee.children && employee.children.length > 0 && (
-        <div className="org-children">
-          {employee.children.length > 1 && (
-            <div className="org-horizontal-line"></div>
-          )}
-          {employee.children.map((child) => (
-            <div className="org-child-wrapper" key={child.id}>
-              <div className="org-vertical-line"></div>
-              <OrgNode
-                employee={child}
-                onDragStart={onDragStart}
-                onDrop={onDrop}
-                onDragOver={onDragOver}
-              />
-            </div>
-          ))}
-        </div>
-      )}
+      {showSubordinates &&
+        employee.children &&
+        employee.children.length > 0 && (
+          <div className="org-children">
+            {employee.children.length > 1 && (
+              <div className="org-horizontal-line"></div>
+            )}
+            {employee.children.map((child) => (
+              <div className="org-child-wrapper" key={child.id}>
+                <div className="org-vertical-line"></div>
+                <OrgNode
+                  employee={child}
+                  onDragStart={onDragStart}
+                  onDrop={onDrop}
+                  onDragOver={onDragOver}
+                  highlightedEmployeeId={highlightedEmployeeId}
+                  isHighlighted={child.id === highlightedEmployeeId}
+                />
+              </div>
+            ))}
+          </div>
+        )}
     </div>
   );
 };
 
-const OrgChart: React.FC<OrgChartProps> = ({ employees, onUpdateManager }) => {
+const OrgChart: React.FC<OrgChartProps> = ({
+  employees,
+  onUpdateManager,
+  hoveredEmployeeId,
+}) => {
   const [draggedEmployeeId, setDraggedEmployeeId] = useState<string | null>(
     null
   );
   const [tree, setTree] = useState<Employee[]>([]);
+  const [dropTargetId, setDropTargetId] = useState<string | null>(null);
 
   useEffect(() => {
     setTree(transformToTree(employees));
@@ -100,7 +133,9 @@ const OrgChart: React.FC<OrgChartProps> = ({ employees, onUpdateManager }) => {
 
   const handleDrop = useCallback(
     (newManagerId: string) => {
+      console.log("drop", dropTargetId);
       if (!draggedEmployeeId || draggedEmployeeId === newManagerId) return;
+      setDropTargetId(null);
 
       const isChild = (managerId: string | null, empId: string): boolean => {
         if (!managerId) return false;
@@ -112,7 +147,7 @@ const OrgChart: React.FC<OrgChartProps> = ({ employees, onUpdateManager }) => {
       if (isChild(newManagerId, draggedEmployeeId)) return;
 
       onUpdateManager(draggedEmployeeId, newManagerId);
-
+      toast.success("Org Chart Updated Successfully!");
       setDraggedEmployeeId(null);
     },
     [draggedEmployeeId, employees, onUpdateManager]
@@ -133,8 +168,11 @@ const OrgChart: React.FC<OrgChartProps> = ({ employees, onUpdateManager }) => {
           onDragStart={handleDragStart}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
+          highlightedEmployeeId={hoveredEmployeeId}
+          isHighlighted={root.id === hoveredEmployeeId}
         />
       ))}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

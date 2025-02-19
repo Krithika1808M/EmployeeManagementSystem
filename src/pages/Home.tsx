@@ -6,13 +6,21 @@ import OrgChart from "../components/OrgChart";
 import EmployeeList from "../components/EmployeesList";
 
 import "./Home.css";
+import { FaInfoCircle } from "react-icons/fa";
+import { Oval } from "react-loader-spinner";
 
 // a simple header suitable for the application
-const Header: React.FC = () => {
+const Header: React.FC = () => (
+  <header className="header">
+    <h1>HappyFox Employee Management System</h1>
+  </header>
+);
+
+const WelcomeMessage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   return (
-    <header className="header">
-      <h1>HappyFox Employee Management System</h1>
-    </header>
+    <div className="welcome-message">
+      <span>Welcome to HappyFox Employee Management System!</span>
+    </div>
   );
 };
 
@@ -21,6 +29,9 @@ const Home: React.FC = () => {
   const { employees, updateEmployee } = useEmployees();
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [hoveredEmployeeId, setHoveredEmployeeId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,7 +39,7 @@ const Home: React.FC = () => {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [showWelcome]);
 
   const handleUpdateManager = async (
     employeeId: string,
@@ -50,32 +61,48 @@ const Home: React.FC = () => {
   };
 
   const filteredEmployees: Employee[] = selectedTeam
-    ? employees.filter((emp) => emp.team === selectedTeam)
+    ? employees.filter(
+        (emp) => emp.team?.toLowerCase() === selectedTeam.toLowerCase()
+      )
     : employees;
 
   return (
     <div className="home-wrapper">
       <Header />
-      {showWelcome && (
-        <div className="welcome-message">Welcome to HappyFox!</div>
-      )}
+      {showWelcome && <WelcomeMessage onClose={() => setShowWelcome(false)} />}
 
       <div className="home-container">
         <div className="sidebar">
-          <EmployeeList onSelect={setSelectedTeam} />
+          <EmployeeList
+            onSelect={setSelectedTeam}
+            onHover={setHoveredEmployeeId}
+          />
         </div>
         <div className="org-chart-section">
+          <div className="org-chart-instruction">
+            <FaInfoCircle className="info-icon" />
+            <span>
+              You can also filter based on teams in the left to view the
+              specific team's chart.
+            </span>
+          </div>
+
           {filteredEmployees.length > 0 ? (
             <OrgChart
               employees={filteredEmployees}
               onUpdateManager={handleUpdateManager}
+              hoveredEmployeeId={hoveredEmployeeId}
             />
           ) : (
-            <p>
-              {selectedTeam
-                ? `No employees found in ${selectedTeam} team.`
-                : "No employees available."}
-            </p>
+            <div className="loading-overlay">
+              <Oval
+                height={100}
+                width={100}
+                color="#007bff"
+                secondaryColor="#ddd"
+              />
+              <p>Loading employees...</p>
+            </div>
           )}
         </div>
       </div>

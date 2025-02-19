@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 import Select from "react-select";
 import { useEmployees } from "../context/EmployeeContext";
-import { FaFilter, FaLaptopCode, FaUserTie, FaUsers } from "react-icons/fa";
+import {
+  FaFilter,
+  FaLaptopCode,
+  FaUserTie,
+  FaUsers,
+  FaTimes,
+  FaEdit,
+} from "react-icons/fa";
 import "./EmployeeList.css";
 
 interface EmployeeListProps {
   onSelect: (id: string) => void;
+  onHover: (id: string | null) => void;
 }
 
 const teamOptions = [
@@ -57,17 +65,28 @@ const customStyles = {
   }),
 };
 
-const EmployeeList: React.FC<EmployeeListProps> = ({ onSelect }) => {
-  const { employees, isLoading } = useEmployees();
+const EmployeeList: React.FC<EmployeeListProps> = ({ onSelect, onHover }) => {
+  const { employees, updateEmployee } = useEmployees();
   const [search, setSearch] = useState("");
   const [teamFilter, setTeamFilter] = useState("");
-
-  if (isLoading) return <p>Loading...</p>;
+  const [selectedEmployee, setSelectedEmployee] = useState<any | null>(null);
+  const [editedName, setEditedName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   const findManagerName = (managerId: string | null) => {
     if (!managerId) return "No Manager";
     const manager = employees.find((emp) => emp.id === managerId);
     return manager ? manager.name : `ID: ${managerId}`;
+  };
+
+  const handleSave = async () => {
+    if (selectedEmployee) {
+      await updateEmployee({
+        employeeId: selectedEmployee.id,
+        updates: { name: editedName },
+      });
+      setIsEditing(false);
+    }
   };
 
   const filteredEmployees = employees.filter(
@@ -116,8 +135,14 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ onSelect }) => {
           <li
             key={employee.id}
             className="employee-item"
-            onClick={() => onSelect(employee.id)}
             data-testid={`employee-item-${employee.id}`}
+            onClick={() => {
+              setSelectedEmployee(employee);
+              setEditedName(employee.name);
+              setIsEditing(false);
+            }}
+            onMouseEnter={() => onHover(employee.id)}
+            onMouseLeave={() => onHover(null)}
           >
             <div
               className="employee-name"
@@ -137,6 +162,65 @@ const EmployeeList: React.FC<EmployeeListProps> = ({ onSelect }) => {
           </li>
         ))}
       </ul>
+
+      {selectedEmployee && (
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedEmployee(null)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="close-btn"
+              onClick={() => setSelectedEmployee(null)}
+            >
+              <FaTimes />
+            </button>
+            <img
+              src={`https://randomuser.me/api/portraits/men/${
+                parseInt(selectedEmployee.id) % 50
+              }.jpg`}
+              alt={selectedEmployee.name}
+              className="modal-photo"
+            />
+
+            <div className="edit-name-container">
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  className="edit-name-input"
+                />
+              ) : (
+                <h2>
+                  {selectedEmployee.name}{" "}
+                  <FaEdit
+                    className="edit-icon"
+                    onClick={() => setIsEditing(true)}
+                  />
+                </h2>
+              )}
+            </div>
+
+            {isEditing && (
+              <button className="save-btn" onClick={handleSave}>
+                Save
+              </button>
+            )}
+
+            <p>
+              <strong>Designation:</strong> {selectedEmployee.designation}
+            </p>
+            <p>
+              <strong>Team:</strong> {selectedEmployee.team}
+            </p>
+            <p>
+              <strong>Manager:</strong>{" "}
+              {findManagerName(selectedEmployee.managerId)}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

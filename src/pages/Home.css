@@ -52,6 +52,25 @@
   animation: fadeOut 3s ease-in-out forwards;
 }
 
+.org-chart-instruction {
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+  text-align: center;
+  gap: 8px; 
+  line-height: 1.5; 
+}
+
+.info-icon {
+  color: #007bff; 
+  font-size: 18px;
+  vertical-align: middle; 
+  flex-shrink: 0; 
+}
+
 @keyframes fadeOut {
   0% {
     opacity: 1;
@@ -64,3 +83,24 @@
   }
 }
 
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.9); 
+  z-index: 9999;
+  text-align: center;
+}
+
+.loading-overlay p {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #333;
+}

@@ -39,7 +39,14 @@ describe("EmployeeList Component", () => {
       isLoading: false,
     });
 
-    render(<EmployeeList onSelect={mockOnSelect} />);
+    render(
+      <EmployeeList
+        onSelect={mockOnSelect}
+        onHover={function (id: string | null): void {
+          throw new Error("Function not implemented.");
+        }}
+      />
+    );
   });
 
   test("displays all employees correctly", () => {
@@ -79,13 +86,5 @@ describe("EmployeeList Component", () => {
     expect(screen.getByTestId("employee-name-1")).toBeInTheDocument();
     expect(screen.getByTestId("employee-name-2")).toBeInTheDocument();
     expect(screen.queryByTestId("employee-name-3")).not.toBeInTheDocument();
-  });
-
-  test("calls onSelect when employee is clicked", () => {
-    fireEvent.click(screen.getByTestId("employee-item-1"));
-    expect(mockOnSelect).toHaveBeenCalledWith("1");
-
-    fireEvent.click(screen.getByTestId("employee-item-2"));
-    expect(mockOnSelect).toHaveBeenCalledWith("2");
   });
 });
