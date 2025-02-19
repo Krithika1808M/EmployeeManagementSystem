@@ -121,7 +121,6 @@ const OrgChart: React.FC<OrgChartProps> = ({
     null
   );
   const [tree, setTree] = useState<Employee[]>([]);
-  const [dropTargetId, setDropTargetId] = useState<string | null>(null);
 
   useEffect(() => {
     setTree(transformToTree(employees));
@@ -133,9 +132,7 @@ const OrgChart: React.FC<OrgChartProps> = ({
 
   const handleDrop = useCallback(
     (newManagerId: string) => {
-      console.log("drop", dropTargetId);
       if (!draggedEmployeeId || draggedEmployeeId === newManagerId) return;
-      setDropTargetId(null);
 
       const isChild = (managerId: string | null, empId: string): boolean => {
         if (!managerId) return false;
